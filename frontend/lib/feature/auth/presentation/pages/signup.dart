@@ -1,15 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/common/helper/appbar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/common/widgets/appbar.dart';
 import 'package:frontend/common/helper/navigator/app_navigator.dart';
-import 'package:frontend/core/config/theme/app_color.dart';
+import 'package:frontend/common/widgets/uihelper.dart';
+import 'package:frontend/core/assets/app_images.dart';
+import 'package:frontend/feature/auth/data/models/user_creation_req.dart';
+import 'package:frontend/feature/auth/presentation/bloc/auth_bloc.dart';
 import 'package:frontend/feature/auth/presentation/pages/signin.dart';
 
 class SignUp extends StatelessWidget {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _firstNameController = TextEditingController();
-  TextEditingController _lastNameController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   SignUp({super.key});
 
@@ -17,33 +21,78 @@ class SignUp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BasicAppBar(),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "User Crete Successfully",
+                  style: TextStyle(color: Colors.greenAccent),
+                ),
+                backgroundColor: Color.fromARGB(255, 201, 152, 140),
+              ),
+            );
+            return AppNavigator.push(context, SignIn());
+          } else if (state is AuthFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.massage,
+                  style: TextStyle(color: Colors.red),
+                ),
+                backgroundColor: Color.fromARGB(255, 201, 152, 140),
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _signUpText(),
-              const SizedBox(height: 80),
+          return Padding(
+            padding: const EdgeInsets.only(top: 54),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
 
-              _FirstNameField(context),
-              const SizedBox(height: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 50,
+                    width: 200,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(AppImages.logo),
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
 
-              _lastNameField(context),
-              const SizedBox(height: 15),
+                  _signUpText(),
+                  const SizedBox(height: 20),
 
-              _emailField(context),
-              const SizedBox(height: 15),
-              _passwordField(context),
-              const SizedBox(height: 35),
-              _signUpButton(),
-              const SizedBox(height: 15),
-              _signup(context),
-            ],
-          ),
-        ),
+                  _FirstNameField(context),
+                  const SizedBox(height: 10),
+
+                  _lastNameField(context),
+                  const SizedBox(height: 10),
+
+                  _emailField(context),
+                  const SizedBox(height: 10),
+                  _passwordField(context),
+                  const SizedBox(height: 20),
+                  _signUpButton(context),
+                  const SizedBox(height: 15),
+                  _signup(context),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -56,46 +105,54 @@ class SignUp extends StatelessWidget {
   }
 
   Widget _FirstNameField(BuildContext context) {
-    return TextField(
+    return UiHelper.CustomTexField(
       controller: _firstNameController,
-      decoration: InputDecoration(hintText: "First Name"),
+      text: "first name",
+      toHide: false,
+      textInputType: TextInputType.name,
     );
   }
 
   Widget _lastNameField(BuildContext context) {
-    return TextField(
+    return UiHelper.CustomTexField(
       controller: _lastNameController,
-      decoration: InputDecoration(hintText: "Last Name"),
+      text: "last name",
+      toHide: false,
+      textInputType: TextInputType.name,
     );
   }
 
   Widget _emailField(BuildContext context) {
-    return TextField(
+    return UiHelper.CustomTexField(
       controller: _emailController,
-      decoration: InputDecoration(hintText: "Email"),
+      text: "email",
+      toHide: false,
+      textInputType: TextInputType.emailAddress,
     );
   }
 
   Widget _passwordField(BuildContext context) {
-    return TextField(
+    return UiHelper.CustomTexField(
       controller: _passwordController,
-      decoration: InputDecoration(hintText: " Password"),
+      text: "password",
+      toHide: true,
+      textInputType: TextInputType.text,
     );
   }
 
-  Widget _signUpButton() {
-    return Container(
-      width: double.infinity,
-      height: 40,
-      decoration: BoxDecoration(color: Colors.transparent),
-      child: ElevatedButton(
-        onPressed: () {},
-        child: Text(
-          "Sign Up",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-        ),
-        style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-      ),
+  Widget _signUpButton(BuildContext context) {
+    return UiHelper.CustomButton(
+      buttonname: "Sign Up",
+      callback: () {
+        final user = UserCreationReq(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          firstName: _firstNameController.text.trim(),
+        );
+
+        context.read<AuthBloc>().add(SignUpRequested(user));
+      },
     );
   }
 

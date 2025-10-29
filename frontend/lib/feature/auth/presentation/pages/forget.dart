@@ -1,12 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/common/helper/appbar.dart';
+import 'package:frontend/common/widgets/appbar.dart';
 import 'package:frontend/common/helper/navigator/app_navigator.dart';
-import 'package:frontend/core/config/theme/app_color.dart';
+import 'package:frontend/common/widgets/uihelper.dart';
 import 'package:frontend/feature/auth/presentation/pages/signin.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
-  TextEditingController _emailController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   ForgotPasswordPage({super.key});
 
@@ -41,12 +41,11 @@ class ForgotPasswordPage extends StatelessWidget {
   }
 
   Widget _emailField(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextField(
-        controller: _emailController,
-        decoration: InputDecoration(hintText: "Email"),
-      ),
+    return UiHelper.CustomTexField(
+      controller: _emailController,
+      text: "Email",
+      toHide: false,
+      textInputType: TextInputType.emailAddress,
     );
   }
 
@@ -73,18 +72,6 @@ class ForgotPasswordPage extends StatelessWidget {
   }
 
   Widget _sendResetlinkButton() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(color: Colors.transparent),
-      child: ElevatedButton(
-        onPressed: () {},
-        child: Text(
-          "Reset Password",
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 18),
-        ),
-        style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-      ),
-    );
+    return UiHelper.CustomButton(buttonname: "Reset Link", callback: () {});
   }
 }

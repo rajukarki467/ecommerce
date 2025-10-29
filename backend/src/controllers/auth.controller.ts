@@ -4,10 +4,10 @@ import asyncHandler from "../utils/asyncHandler";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password, role } = req.body;
-  const { user, token } = await registerUser(name, email, password, role);
+  const { user } = await registerUser(name, email, password, role);
   res
     .status(201)
-    .json({ message: "User registered successfully", user, token });
+    .json({ message: "User registered successfully", user });
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {

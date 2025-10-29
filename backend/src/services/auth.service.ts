@@ -12,8 +12,8 @@ export const registerUser = async (
   if (existingUser) throw new AppError("Email already registered", 400);
 
   const user = await User.create({ name, email, password, role });
-  const token = generateToken(user._id.toString());
-  return { user, token };
+
+  return { user };
 };
 
 export const loginUser = async (email: string, password: string) => {

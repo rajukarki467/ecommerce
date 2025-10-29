@@ -13,3 +13,5 @@ class SignUpRequested extends AuthEvent {
 
   SignUpRequested(this.userCreationReq);
 }
+
+class SignOutRequested extends AuthEvent {}

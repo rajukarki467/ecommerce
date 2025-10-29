@@ -5,8 +5,8 @@ import 'package:frontend/core/assets/app_images.dart';
 import 'package:frontend/core/config/theme/app_color.dart';
 import 'package:frontend/feature/auth/presentation/pages/signin.dart';
 import 'package:frontend/feature/home/presentation/pages/bottomnavbarScreen.dart';
-import 'package:frontend/feature/splash/presentation/cubit/splash_cubit.dart';
-import 'package:frontend/feature/splash/presentation/cubit/splash_state.dart';
+import 'package:frontend/common/cubit/splash_cubit.dart';
+import 'package:frontend/common/cubit/splash_state.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});

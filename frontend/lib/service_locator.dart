@@ -1,4 +1,5 @@
 import 'package:frontend/feature/auth/data/datasources/auth_backend_service.dart';
+import 'package:frontend/feature/auth/data/datasources/local_user_service.dart';
 import 'package:frontend/feature/auth/data/repository/auth_repository_impl.dart';
 import 'package:frontend/feature/auth/domain/repository/auth_repository.dart';
 import 'package:frontend/feature/auth/domain/usecases/signin.dart';
@@ -13,6 +14,9 @@ Future<void> initializeDependencies() async {
 
   //repositories
   sl.registerSingleton<AuthRepository>(AuthRepositoryImpl());
+
+  // local storage
+  sl.registerLazySingleton<LocalUserService>(() => LocalUserServiceImpl());
 
   //UseCases
 

@@ -14,6 +14,7 @@ class SignUp extends StatelessWidget {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   SignUp({super.key});
 
@@ -56,39 +57,42 @@ class SignUp extends StatelessWidget {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 30),
 
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 50,
-                    width: 200,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(AppImages.logo),
-                        fit: BoxFit.fill,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(AppImages.logo),
+                          fit: BoxFit.fill,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 15),
+                    const SizedBox(height: 15),
 
-                  _signUpText(),
-                  const SizedBox(height: 20),
+                    _signUpText(),
+                    const SizedBox(height: 20),
 
-                  _FirstNameField(context),
-                  const SizedBox(height: 10),
+                    _FirstNameField(context),
+                    const SizedBox(height: 10),
 
-                  _lastNameField(context),
-                  const SizedBox(height: 10),
+                    _lastNameField(context),
+                    const SizedBox(height: 10),
 
-                  _emailField(context),
-                  const SizedBox(height: 10),
-                  _passwordField(context),
-                  const SizedBox(height: 20),
-                  _signUpButton(context),
-                  const SizedBox(height: 15),
-                  _signup(context),
-                ],
+                    _emailField(context),
+                    const SizedBox(height: 10),
+                    _passwordField(context),
+                    const SizedBox(height: 20),
+                    _signUpButton(context),
+                    const SizedBox(height: 15),
+                    _signup(context),
+                  ],
+                ),
               ),
             ),
           );
@@ -110,6 +114,12 @@ class SignUp extends StatelessWidget {
       text: "first name",
       toHide: false,
       textInputType: TextInputType.name,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your first name';
+        }
+        return null;
+      },
     );
   }
 
@@ -119,6 +129,12 @@ class SignUp extends StatelessWidget {
       text: "last name",
       toHide: false,
       textInputType: TextInputType.name,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your last name';
+        }
+        return null;
+      },
     );
   }
 
@@ -128,6 +144,26 @@ class SignUp extends StatelessWidget {
       text: "email",
       toHide: false,
       textInputType: TextInputType.emailAddress,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your email';
+        }
+
+        // Trim spaces
+        value = value.trim();
+
+        // General email format check
+        final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$');
+
+        if (!emailRegex.hasMatch(value)) {
+          if (value.contains('@') && !value.endsWith('@gmail.com')) {
+            return 'Only Gmail addresses are allowed';
+          }
+          return 'Please enter a valid Gmail address (e.g. raju@gmail.com)';
+        }
+
+        return null;
+      },
     );
   }
 
@@ -137,6 +173,14 @@ class SignUp extends StatelessWidget {
       text: "password",
       toHide: true,
       textInputType: TextInputType.text,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your email';
+        } else if (value.length < 8) {
+          return 'Please enter a password more than 8 character ';
+        }
+        return null;
+      },
     );
   }
 
@@ -144,14 +188,17 @@ class SignUp extends StatelessWidget {
     return UiHelper.CustomButton(
       buttonname: "Sign Up",
       callback: () {
-        final user = UserCreationReq(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-          lastName: _lastNameController.text.trim(),
-          firstName: _firstNameController.text.trim(),
-        );
+        if (_formKey.currentState!.validate()) {
+          // ✅ Proceed only if all fields are valid
+          final user = UserCreationReq(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+            lastName: _lastNameController.text.trim(),
+            firstName: _firstNameController.text.trim(),
+          );
 
-        context.read<AuthBloc>().add(SignUpRequested(user));
+          context.read<AuthBloc>().add(SignUpRequested(user));
+        }
       },
     );
   }

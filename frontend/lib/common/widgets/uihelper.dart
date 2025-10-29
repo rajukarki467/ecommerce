@@ -21,10 +21,12 @@ class UiHelper {
     required String text,
     required bool toHide,
     required TextInputType textInputType,
+    String? Function(String?)? validator,
   }) {
     return SizedBox(
       height: 50,
-      child: TextField(
+      child: TextFormField(
+        validator: validator,
         keyboardType: textInputType,
         controller: controller,
         obscureText: toHide,
@@ -35,7 +37,7 @@ class UiHelper {
             fontWeight: FontWeight.normal,
             color: Colors.grey.shade700,
           ),
-          border: InputBorder.none,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
         ),
       ),
     );

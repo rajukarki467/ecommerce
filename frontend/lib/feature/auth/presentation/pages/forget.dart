@@ -7,6 +7,7 @@ import 'package:frontend/feature/auth/presentation/pages/signin.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   ForgotPasswordPage({super.key});
 
@@ -16,18 +17,21 @@ class ForgotPasswordPage extends StatelessWidget {
       appBar: BasicAppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _forgotText(),
-            const SizedBox(height: 80),
-            _emailField(context),
-            const SizedBox(height: 10),
-            _backtohomePage(context),
-            const SizedBox(height: 20),
-            _sendResetlinkButton(),
-          ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _forgotText(),
+              const SizedBox(height: 80),
+              _emailField(context),
+              const SizedBox(height: 10),
+              _backtohomePage(context),
+              const SizedBox(height: 20),
+              _sendResetlinkButton(),
+            ],
+          ),
         ),
       ),
     );
@@ -46,6 +50,26 @@ class ForgotPasswordPage extends StatelessWidget {
       text: "Email",
       toHide: false,
       textInputType: TextInputType.emailAddress,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your email';
+        }
+
+        // Trim spaces
+        value = value.trim();
+
+        // General email format check
+        final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$');
+
+        if (!emailRegex.hasMatch(value)) {
+          if (value.contains('@') && !value.endsWith('@gmail.com')) {
+            return 'Only Gmail addresses are allowed';
+          }
+          return 'Please enter a valid Gmail address (e.g. raju@gmail.com)';
+        }
+
+        return null; // ✅ valid
+      },
     );
   }
 

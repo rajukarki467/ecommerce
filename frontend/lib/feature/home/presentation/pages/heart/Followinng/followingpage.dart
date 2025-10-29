@@ -42,29 +42,27 @@ class Followingpage extends StatelessWidget {
     ];
 
     return Scaffold(
-      body: Expanded(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: ListTile(
-                  leading: UiHelper.CustomImage(
-                    imgurl: arrContent[index]['img'].toString(),
-                  ),
-                  title: Text(
-                    arrContent[index]['txt'].toString(),
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  trailing: UiHelper.CustomImage(
-                    imgurl: arrContent[index]['im1'].toString(),
-                  ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: ListView.builder(
+          itemCount: arrContent.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: ListTile(
+                leading: UiHelper.CustomImage(
+                  imgurl: arrContent[index]['img'].toString(),
                 ),
-              );
-            },
-            itemCount: arrContent.length,
-          ),
+                title: Text(
+                  arrContent[index]['txt'].toString(),
+                  style: const TextStyle(fontSize: 14),
+                ),
+                trailing: UiHelper.CustomImage(
+                  imgurl: arrContent[index]['im1'].toString(),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

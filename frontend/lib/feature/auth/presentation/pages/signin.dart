@@ -1,48 +1,139 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/common/helper/navigator/app_navigator.dart';
-import 'package:frontend/core/config/theme/app_color.dart';
+import 'package:frontend/common/widgets/uihelper.dart';
+import 'package:frontend/core/assets/app_images.dart';
+import 'package:frontend/feature/auth/data/models/user_signin_req.dart';
+import 'package:frontend/feature/auth/presentation/bloc/auth_bloc.dart';
 import 'package:frontend/feature/auth/presentation/pages/forget.dart';
 import 'package:frontend/feature/auth/presentation/pages/signup.dart';
+import 'package:frontend/feature/home/presentation/pages/bottomnavbarScreen.dart';
 
 class SignIn extends StatelessWidget {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   SignIn({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _signinText(),
-              const SizedBox(height: 80),
-              _emailField(context),
-              const SizedBox(height: 15),
-              _passwordField(context),
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: _forgetpasswordText(context),
-                  ),
-                ],
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Login Successful",
+                  style: TextStyle(color: Colors.greenAccent),
+                ),
+                backgroundColor: Color.fromARGB(255, 201, 152, 140),
               ),
-              const SizedBox(height: 30),
-              _signInButton(),
-              const SizedBox(height: 15),
-              _signup(context),
-            ],
-          ),
-        ),
+            );
+            AppNavigator.push(context, BottomNavBarPage());
+          }
+          if (state is AuthFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.massage,
+                  style: TextStyle(color: Colors.red),
+                ),
+                backgroundColor: Color.fromARGB(255, 201, 152, 140),
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return Center(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(AppImages.logo),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 15),
+                    _signinText(),
+                    const SizedBox(height: 20),
+
+                    UiHelper.CustomTexField(
+                      controller: _emailController,
+                      text: "Email",
+                      toHide: false,
+                      textInputType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 10),
+                    UiHelper.CustomTexField(
+                      controller: _passwordController,
+                      text: "password",
+                      toHide: true,
+                      textInputType: TextInputType.number,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        UiHelper.CustomTextButton(
+                          text: "Forgot password?",
+                          callback: () {
+                            AppNavigator.push(context, ForgotPasswordPage());
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    UiHelper.CustomButton(
+                      buttonname: "Log In",
+                      callback: () {
+                        final user = UserSigninReq(
+                          email: _emailController.text.trim(),
+                          password: _passwordController.text.trim(),
+                        );
+
+                        context.read<AuthBloc>().add(SignInRequested(user));
+                      },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(AppImages.icon),
+                        UiHelper.CustomTextButton(
+                          text: "Log in with Facebook",
+                          callback: () {},
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    const Text(
+                      "OR",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _signup(context),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -51,52 +142,6 @@ class SignIn extends StatelessWidget {
     return Text(
       "Sign In",
       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 32),
-    );
-  }
-
-  Widget _emailField(BuildContext context) {
-    return TextField(
-      controller: _emailController,
-      decoration: InputDecoration(hintText: "Email"),
-    );
-  }
-
-  Widget _passwordField(BuildContext context) {
-    return TextField(
-      controller: _passwordController,
-      decoration: InputDecoration(hintText: "Password"),
-    );
-  }
-
-  Widget _forgetpasswordText(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        AppNavigator.push(context, ForgotPasswordPage());
-      },
-      child: Text(
-        "Forget Password?",
-        style: const TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 14,
-          color: Colors.grey,
-        ),
-      ),
-    );
-  }
-
-  Widget _signInButton() {
-    return Container(
-      width: double.infinity,
-      height: 40,
-      decoration: BoxDecoration(color: Colors.transparent),
-      child: ElevatedButton(
-        onPressed: () {},
-        child: Text(
-          "Sign In",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-        ),
-        style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-      ),
     );
   }
 

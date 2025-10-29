@@ -5,7 +5,7 @@ class AppTheme {
   static final appTheme = ThemeData(
     primaryColor: AppColors.primary,
     scaffoldBackgroundColor: AppColors.background,
-    fontFamily: 'CircularStd',
+    fontFamily: 'inter',
     brightness: Brightness.dark,
     inputDecorationTheme: InputDecorationTheme(
       filled: true,

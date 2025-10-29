@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/helper/appbar.dart';
 import 'package:frontend/common/helper/navigator/app_navigator.dart';
 import 'package:frontend/core/config/theme/app_color.dart';
 import 'package:frontend/feature/auth/presentation/pages/signin.dart';
@@ -15,6 +16,7 @@ class SignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: BasicAppBar(),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),

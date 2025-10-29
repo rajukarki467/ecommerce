@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/helper/navigator/app_navigator.dart';
 import 'package:frontend/core/config/theme/app_color.dart';
+import 'package:frontend/feature/auth/presentation/pages/forget.dart';
 import 'package:frontend/feature/auth/presentation/pages/signup.dart';
 
 class SignIn extends StatelessWidget {
@@ -31,7 +32,7 @@ class SignIn extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: _forgetpasswordText(),
+                    child: _forgetpasswordText(context),
                   ),
                 ],
               ),
@@ -67,9 +68,11 @@ class SignIn extends StatelessWidget {
     );
   }
 
-  Widget _forgetpasswordText() {
+  Widget _forgetpasswordText(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        AppNavigator.push(context, ForgotPasswordPage());
+      },
       child: Text(
         "Forget Password?",
         style: const TextStyle(

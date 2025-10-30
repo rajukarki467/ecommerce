@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/common/entities/user.dart';
 import 'package:frontend/feature/auth/data/datasources/local_user_service.dart'
     show LocalUserService;
-import 'package:frontend/feature/auth/data/models/hive_user.dart';
 import 'package:frontend/feature/auth/data/models/user_creation_req.dart';
 import 'package:frontend/feature/auth/data/models/user_signin_req.dart';
 import 'package:frontend/feature/auth/domain/usecases/signin.dart';
@@ -30,13 +29,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     final result = await sl<SignInUseCase>().call(params: event.userSigninReq);
 
-    result.fold((failure) => emit(AuthFailure(failure.toString())), (
-      data,
-    ) async {
-      final user = User.fromMap(data);
-      await sl<LocalUserService>().saveUserFromEntity(user);
-      emit(AuthSuccess(user));
-    });
+    await result.fold(
+      (failure) async {
+        emit(AuthFailure(failure.toString()));
+      },
+      (data) async {
+        final user = User.fromMap(data['user']);
+        final token = data['token'];
+
+        await sl<LocalUserService>().saveUserFromEntity(user, token: token);
+        emit(AuthSuccess(user));
+      },
+    );
   }
 
   Future<void> _onSignUpRequested(
@@ -44,16 +48,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
+
     final result = await sl<SignUpUseCase>().call(
       params: event.userCreationReq,
     );
-    result.fold((failure) => emit(AuthFailure(failure.toString())), (
-      data,
-    ) async {
-      final user = User.fromMap(data);
-      await sl<LocalUserService>().saveUserFromEntity(user);
-      emit(AuthSuccess(user));
-    });
+
+    await result.fold(
+      (failure) async {
+        emit(AuthFailure(failure.toString()));
+      },
+      (data) async {
+        final user = User.fromMap(data['user']);
+        final token = data['token'];
+
+        await sl<LocalUserService>().saveUserFromEntity(user, token: token);
+        emit(AuthSuccess(user));
+      },
+    );
   }
 
   Future<void> _onSignOutRequested(

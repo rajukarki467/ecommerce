@@ -6,14 +6,22 @@ import 'package:frontend/service_locator.dart';
 class SplashCubit extends Cubit<SplashState> {
   SplashCubit() : super(DisplaySplash());
 
-  void appStarted() async {
-    final LocalUserService localUserService = sl<LocalUserService>();
-    await Future.delayed(const Duration(seconds: 2));
-    final isLoggedIn = localUserService.isAuthenticated();
+  Future<void> appStarted() async {
+    final localUserService = sl<LocalUserService>();
 
-    if (isLoggedIn) {
-      emit(Authenticated());
-    } else {
+    emit(DisplaySplash());
+    await Future.delayed(const Duration(seconds: 2));
+
+    try {
+      final isLoggedIn = await localUserService.isAuthenticated();
+
+      if (isLoggedIn) {
+        emit(Authenticated());
+      } else {
+        emit(UnAuthenticated());
+      }
+    } catch (e) {
+      // In case reading from storage fails
       emit(UnAuthenticated());
     }
   }

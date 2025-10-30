@@ -22,13 +22,14 @@ class HiveUserAdapter extends TypeAdapter<HiveUser> {
       lastName: fields[2] as String,
       email: fields[3] as String,
       password: fields[4] as String,
+      token: fields[5] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, HiveUser obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.userId)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class HiveUserAdapter extends TypeAdapter<HiveUser> {
       ..writeByte(3)
       ..write(obj.email)
       ..writeByte(4)
-      ..write(obj.password);
+      ..write(obj.password)
+      ..writeByte(5)
+      ..write(obj.token);
   }
 
   @override

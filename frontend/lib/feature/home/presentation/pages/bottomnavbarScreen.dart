@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/feature/home/presentation/pages/heart/heartscreen.dart';
 import 'package:frontend/feature/home/presentation/pages/home.dart';
-import 'package:frontend/feature/home/presentation/pages/post/postscreen.dart';
 import 'package:frontend/feature/home/presentation/pages/profile/profilescreen.dart';
 import 'package:frontend/feature/home/presentation/pages/search/searchScreen.dart';
+import 'package:frontend/feature/home/presentation/pages/post/uploadpost.dart';
 
 class BottomNavBarPage extends StatefulWidget {
   const BottomNavBarPage({super.key});
@@ -18,7 +18,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
   List<Widget> pages = [
     HomePage(),
     Searchscreen(),
-    Postscreen(),
+    UploadPostScreen(),
     Heartscreen(),
     Profilescreen(),
   ];

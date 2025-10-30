@@ -106,25 +106,6 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            // SizedBox(
-            //   height: 30,
-            //   child: Padding(
-            //     padding: const EdgeInsets.only(left: 20),
-            //     child: ListView.builder(
-            //       itemBuilder: (context, index) {
-            //         return Padding(
-            //           padding: const EdgeInsets.all(8.0),
-            //           child: Text(
-            //             arrHomeContent[index]['name'].toString(),
-            //             style: TextStyle(fontSize: 12),
-            //           ),
-            //         );
-            //       },
-            //       itemCount: arrHomeContent.length,
-            //       scrollDirection: Axis.horizontal,
-            //     ),
-            //   ),
-            // ),
             Container(
               height: 54,
               width: double.infinity,

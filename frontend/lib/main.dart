@@ -16,6 +16,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(HiveUserAdapter());
   await Hive.openBox<HiveUser>('userBox');
+  await Hive.openBox<String>('tokenBox');
 
   runApp(
     MultiBlocProvider(

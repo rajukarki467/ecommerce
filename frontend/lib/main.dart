@@ -4,6 +4,7 @@ import 'package:frontend/core/config/theme/app_theme.dart';
 import 'package:frontend/feature/auth/data/models/hive_user.dart';
 import 'package:frontend/feature/auth/presentation/bloc/auth_bloc.dart';
 import 'package:frontend/common/cubit/splash_cubit.dart';
+import 'package:frontend/feature/home/presentation/bloc/post_bloc.dart';
 import 'package:frontend/feature/splash/presentation/pages/splash.dart';
 import 'package:frontend/service_locator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -20,7 +21,10 @@ void main() async {
 
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => AuthBloc())],
+      providers: [
+        BlocProvider(create: (_) => AuthBloc()),
+        BlocProvider(create: (_) => sl<PostBloc>()),
+      ],
       child: MyApp(),
     ),
   );

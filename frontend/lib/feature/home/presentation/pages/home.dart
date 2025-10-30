@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/feature/home/domain/entity/post.dart';
+import 'package:frontend/feature/home/presentation/bloc/post_bloc.dart';
 import 'package:frontend/common/widgets/uihelper.dart';
 import 'package:frontend/feature/home/presentation/pages/messages/messages_screen.dart';
 
@@ -7,6 +10,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final postBloc = context.read<PostBloc>();
+
+    // Fetch posts when screen opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      postBloc.add(LoadPosts());
+    });
     var arrHomeContent = [
       {
         "name": "Your Story",
@@ -72,116 +81,157 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              height: 90,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 5),
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundImage: NetworkImage(
-                              arrHomeContent[index]['img'].toString(),
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            arrHomeContent[index]['name'].toString(),
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  itemCount: arrHomeContent.length,
-                  scrollDirection: Axis.horizontal,
+      body: BlocConsumer<PostBloc, PostState>(
+        listener: (context, state) {
+          if (state is PostCreated) {
+            // after new post, reload posts
+            postBloc.add(LoadPosts());
+          }
+        },
+        builder: (context, state) {
+          if (state is PostLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is PostLoaded) {
+            final posts = state.posts;
+            if (posts.isEmpty) {
+              return const Center(
+                child: Text(
+                  "No posts yet 💤",
+                  style: TextStyle(color: Colors.white70),
                 ),
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                postBloc.add(LoadPosts());
+              },
+              child: ListView.builder(
+                itemCount: posts.length,
+                itemBuilder: (context, index) {
+                  return _buildPostCard(context, posts[index], postBloc);
+                },
               ),
-            ),
+            );
+          }
 
-            Container(
-              height: 54,
-              width: double.infinity,
-              color: Colors.black12,
-              child: ListTile(
-                leading: UiHelper.CustomImage(imgurl: "person1.png"),
-                title: Text(
-                  "joshus_1",
-                  style: TextStyle(fontSize: 13, color: Color(0xfff9f9f9)),
-                ),
-                subtitle: Text(
-                  "Tokyo ,Japan",
-                  style: TextStyle(fontSize: 11, color: Color(0xfff9f9f9)),
-                ),
-                trailing: UiHelper.CustomImage(imgurl: "More Icon.png"),
+          if (state is PostError) {
+            return Center(
+              child: Text(
+                state.toString(),
+                style: const TextStyle(color: Colors.red),
               ),
-            ),
-            SizedBox(height: 8),
-            Container(
-              clipBehavior: Clip.antiAlias,
-              height: 375,
-              width: double.infinity,
-              decoration: BoxDecoration(),
-              child: Image.asset(
-                "assets/images/Rectangle (1).png",
-                fit: BoxFit.cover,
-              ),
-            ),
-            SizedBox(height: 20),
+            );
+          }
 
-            Row(
-              children: [
-                SizedBox(width: 20),
-                UiHelper.CustomImage(imgurl: "Like.png"),
-                SizedBox(width: 20),
-                UiHelper.CustomImage(imgurl: "Comment.png"),
-                SizedBox(width: 20),
-                UiHelper.CustomImage(imgurl: "Messanger.png"),
-                SizedBox(width: 190),
-
-                UiHelper.CustomImage(imgurl: "Save.png"),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                SizedBox(width: 20),
-
-                UiHelper.CustomImage(imgurl: "Ovalone.png"),
-                SizedBox(width: 5),
-                Text(
-                  "Liked by craig love and 44,686 others.",
-                  style: TextStyle(fontSize: 13, color: Color(0xfff9f9f9)),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(width: 20),
-                Text(
-                  "joshua_l",
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xfff9f9f9),
-                  ),
-                ),
-                Text(
-                  " The game in Japan was amazing and I want ",
-                  style: TextStyle(fontSize: 13, color: Color(0xfff9f9f9)),
-                ),
-              ],
-            ),
-          ],
-        ),
+          return const Center(child: CircularProgressIndicator());
+        },
       ),
+    );
+  }
+
+  // 🖼️ Post Card Widget
+  Widget _buildPostCard(BuildContext context, Post post, PostBloc postBloc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 🧑🏻 User info bar
+        Container(
+          height: 54,
+          width: double.infinity,
+          color: Colors.black12,
+          child: ListTile(
+            leading: const CircleAvatar(
+              radius: 20,
+              backgroundImage: AssetImage("assets/images/person1.png"),
+            ),
+            title: Text(
+              post.user,
+              style: const TextStyle(fontSize: 13, color: Colors.white),
+            ),
+            subtitle: Text(
+              "${post.createdAt.toLocal()}".split(' ')[0],
+              style: const TextStyle(fontSize: 11, color: Colors.white70),
+            ),
+            trailing: Image.asset("assets/images/More Icon.png", height: 20),
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        // 📷 Post image
+        Container(
+          height: 375,
+          width: double.infinity,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+          child: Image.network(
+            post.imageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (context, _, __) => const Center(
+              child: Icon(Icons.broken_image, color: Colors.white38),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        // ❤️ Buttons Row (Like, Comment, Share, Save)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => postBloc.add(LikePost(post.id)),
+                child: Image.asset(
+                  post.likes.isNotEmpty
+                      ? "assets/images/LikeFilled.png"
+                      : "assets/images/Like.png",
+                  height: 24,
+                ),
+              ),
+              const SizedBox(width: 20),
+              Image.asset("assets/images/Comment.png", height: 24),
+              const SizedBox(width: 20),
+              Image.asset("assets/images/Messanger.png", height: 24),
+              const Spacer(),
+              Image.asset("assets/images/Save.png", height: 24),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        // 💬 Likes
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            "${post.likes.length} likes",
+            style: const TextStyle(fontSize: 13, color: Colors.white),
+          ),
+        ),
+
+        // 📝 Caption
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: RichText(
+            text: TextSpan(
+              style: const TextStyle(color: Colors.white),
+              children: [
+                TextSpan(
+                  text: "${post.user} ",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: post.caption),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+      ],
     );
   }
 }

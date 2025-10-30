@@ -20,3 +20,8 @@ class PostLiked extends PostState {
   final Post post;
   PostLiked(this.post);
 }
+
+class PostError extends PostState {
+  final String message;
+  PostError(this.message);
+}

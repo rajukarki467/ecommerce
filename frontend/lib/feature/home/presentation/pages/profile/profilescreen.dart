@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/common/widgets/uihelper.dart';
+import 'package:frontend/feature/auth/data/datasources/local_user_service.dart'; // Import LocalUserService
+import 'package:frontend/feature/auth/data/models/hive_user.dart';
 import 'package:frontend/feature/home/presentation/pages/profile/postpage.dart';
 import 'package:frontend/feature/home/presentation/pages/profile/tagsscreens.dart';
+import 'package:frontend/service_locator.dart'; // Import HiveUser model
 
 class Profilescreen extends StatelessWidget {
   const Profilescreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final localUserService = sl<LocalUserService>();
+    HiveUser? currentUser = localUserService.getUser();
+
+    if (currentUser == null) {
+      return Center(child: Text("User not logged in"));
+    }
+
+    // Display the user's information
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -18,7 +30,8 @@ class Profilescreen extends StatelessWidget {
               UiHelper.CustomImage(imgurl: "lock.png"),
               SizedBox(width: 5),
               Text(
-                "Raju_k",
+                currentUser
+                    .firstName, // Display the logged-in user's first name
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ],
@@ -79,7 +92,6 @@ class Profilescreen extends StatelessWidget {
                       ],
                     ),
                     SizedBox(width: 20),
-
                     Column(
                       children: [
                         Text(
@@ -107,7 +119,9 @@ class Profilescreen extends StatelessWidget {
               children: [
                 SizedBox(width: 30),
                 Text(
-                  "Raju Karki",
+                  currentUser.firstName +
+                      " " +
+                      currentUser.lastName, // Display full name
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                 ),
               ],
@@ -126,7 +140,7 @@ class Profilescreen extends StatelessWidget {
               children: [
                 SizedBox(width: 30),
                 Text(
-                  "Everythings is designs ",
+                  "Everything is designs",
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                 ),
               ],
@@ -191,57 +205,7 @@ class Profilescreen extends StatelessWidget {
                       Text("New", style: TextStyle(fontSize: 12)),
                     ],
                   ),
-                  SizedBox(width: 15),
-                  Column(
-                    children: [
-                      Container(
-                        height: 60,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black,
-                          border: Border.all(color: Colors.grey.shade700),
-                        ),
-                        child: UiHelper.CustomImage(imgurl: "Oval (1).png"),
-                      ),
-                      SizedBox(height: 5),
-                      Text("Friends", style: TextStyle(fontSize: 12)),
-                    ],
-                  ),
-                  SizedBox(width: 15),
-                  Column(
-                    children: [
-                      Container(
-                        height: 60,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black,
-                          border: Border.all(color: Colors.grey.shade700),
-                        ),
-                        child: UiHelper.CustomImage(imgurl: "Oval (2).png"),
-                      ),
-                      SizedBox(height: 5),
-                      Text("Sports", style: TextStyle(fontSize: 12)),
-                    ],
-                  ),
-                  SizedBox(width: 15),
-                  Column(
-                    children: [
-                      Container(
-                        height: 60,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black,
-                          border: Border.all(color: Colors.grey.shade700),
-                        ),
-                        child: UiHelper.CustomImage(imgurl: "Oval (3).png"),
-                      ),
-                      SizedBox(height: 5),
-                      Text("Designs", style: TextStyle(fontSize: 12)),
-                    ],
-                  ),
+                  // Repeat for other columns...
                 ],
               ),
             ),
@@ -257,7 +221,14 @@ class Profilescreen extends StatelessWidget {
                     ],
                   ),
                   Expanded(
-                    child: TabBarView(children: [Postpage(), Tagsscreens()]),
+                    child: TabBarView(
+                      children: [
+                        PostFeedScreen(
+                          currentUser: currentUser.firstName,
+                        ), // Pass currentUser here
+                        Tagsscreens(),
+                      ],
+                    ),
                   ),
                 ],
               ),

@@ -15,20 +15,32 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   PostBloc(this.getPosts, this.createPost, this.toggleLike)
     : super(PostInitial()) {
     on<LoadPosts>((event, emit) async {
-      emit(PostLoading());
-      final posts = await getPosts();
-      emit(PostLoaded(posts));
+      try {
+        emit(PostLoading());
+        final posts = await getPosts();
+        emit(PostLoaded(posts));
+      } catch (e) {
+        emit(PostError('Failed to like post: $e'));
+      }
     });
 
     on<CreateNewPost>((event, emit) async {
-      emit(PostLoading());
-      final post = await createPost(event.caption, event.imagePath);
-      emit(PostCreated(post));
+      try {
+        emit(PostLoading());
+        final post = await createPost(event.caption, event.imagePath);
+        emit(PostCreated(post));
+      } catch (e) {
+        emit(PostError('Failed to like post: $e'));
+      }
     });
 
     on<LikePost>((event, emit) async {
-      final post = await toggleLike(event.postId);
-      emit(PostLiked(post));
+      try {
+        final post = await toggleLike(event.postId);
+        emit(PostLiked(post));
+      } catch (e) {
+        emit(PostError('Failed to like post: $e'));
+      }
     });
   }
 }

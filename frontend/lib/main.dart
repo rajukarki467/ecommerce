@@ -11,10 +11,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ Initialize all dependencies (includes Hive + posts)
   await initializeDependencies();
 
-  //hive using generate the adpator
-  await Hive.initFlutter();
+  // 🧠 Register HiveUser adapter and open boxes
   Hive.registerAdapter(HiveUserAdapter());
   await Hive.openBox<HiveUser>('userBox');
   await Hive.openBox<String>('tokenBox');
@@ -25,7 +26,7 @@ void main() async {
         BlocProvider(create: (_) => AuthBloc()),
         BlocProvider(create: (_) => sl<PostBloc>()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }

@@ -21,7 +21,6 @@ class ApiClient {
           return handler.next(options);
         },
         onError: (error, handler) {
-          print('🚨 Dio Error: ${error.response?.data}');
           return handler.next(error);
         },
       ),

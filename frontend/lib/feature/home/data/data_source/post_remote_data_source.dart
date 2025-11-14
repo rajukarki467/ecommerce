@@ -41,7 +41,7 @@ class PostRemoteDataSourceImpl implements PostRemoteDataSource {
         throw Exception('Invalid API response format: $decoded');
       }
     } catch (e, s) {
-      print('❌ createPost error: $e\n$s');
+      print('createPost error: $e\n$s');
       rethrow;
     }
   }

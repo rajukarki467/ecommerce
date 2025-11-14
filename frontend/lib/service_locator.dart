@@ -1,4 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:frontend/core/network/network_info.dart';
 import 'package:frontend/feature/home/data/model/post_data.dart' hide Post;
 import 'package:frontend/feature/home/domain/entity/post.dart';
 import 'package:get_it/get_it.dart';
@@ -22,6 +24,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 final sl = GetIt.instance;
 
 Future<void> initializeDependencies() async {
+  //checking network connectivity
+  sl.registerLazySingleton(() => Connectivity());
+  sl.registerLazySingleton(() => NetworkInfo(sl<Connectivity>()));
+
   // ✅ Hive is initialized once here
   await Hive.initFlutter();
   Hive.registerAdapter(PostDataAdapter());
@@ -53,6 +59,7 @@ Future<void> initializeDependencies() async {
     () => PostRepositoryImpl(
       sl<PostRemoteDataSource>(),
       sl<PostLocalDataSource>(),
+      sl<NetworkInfo>(),
     ),
   );
 

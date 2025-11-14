@@ -29,7 +29,6 @@ class PostLocalDataSourceImpl implements PostLocalDataSource {
         .toList();
 
     await box.addAll(postDataList);
-    print('✅ Cached ${postDataList.length} posts in Hive');
   }
 
   @override
@@ -48,7 +47,6 @@ class PostLocalDataSourceImpl implements PostLocalDataSource {
         )
         .toList();
 
-    print('📦 Retrieved ${posts.length} cached posts');
     return posts;
   }
 
@@ -63,6 +61,5 @@ class PostLocalDataSourceImpl implements PostLocalDataSource {
       createdAt: post.createdAt,
     );
     await box.put(post.id, pd);
-    print('📝 Saved post locally with id: ${post.id}');
   }
 }

@@ -67,7 +67,7 @@ class PostRemoteDataSourceImpl implements PostRemoteDataSource {
   @override
   Future<PostModel> toggleLike(String postId) async {
     try {
-      final response = await client.patch(
+      final response = await client.post(
         '${ApiConstants.posts}/$postId/like',
         null,
       );

@@ -187,7 +187,7 @@ class HomePage extends StatelessWidget {
                 onTap: () => postBloc.add(LikePost(post.id)),
                 child: Image.asset(
                   post.likes.isNotEmpty
-                      ? "assets/images/LikeFilled.png"
+                      ? "assets/images/likedfil.png"
                       : "assets/images/Like.png",
                   height: 24,
                 ),

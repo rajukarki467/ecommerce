@@ -37,6 +37,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<LikePost>((event, emit) async {
       try {
         final post = await toggleLike(event.postId);
+        print('----------------------$post ....................');
         emit(PostLiked(post));
       } catch (e) {
         emit(PostError('Failed to like post: $e'));

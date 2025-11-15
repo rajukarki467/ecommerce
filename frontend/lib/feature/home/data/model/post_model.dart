@@ -11,11 +11,15 @@ class PostModel extends Post {
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
+    final userField = json['user'];
+
     return PostModel(
       id: json['_id'] ?? '',
       caption: json['caption'] ?? '',
       imageUrl: json['imageUrl'] ?? '',
-      user: json['user']?['name'].toString() ?? 'Unknown',
+      user: userField is Map
+          ? userField['name']?.toString() ?? 'Unknown'
+          : userField?.toString() ?? 'Unknown',
       likes: List<String>.from(json['likes'] ?? []),
       createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
     );
